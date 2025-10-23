@@ -3,9 +3,10 @@ uvicorn[standard]==0.30.6
 SQLAlchemy==2.0.35
 Jinja2==3.1.4
 python-multipart==0.0.9
+email-validator==2.2.0
 
 # Auth/crypto
-passlib[bcrypt]==1.7.4
+passlib==1.7.4
 itsdangerous==2.2.0
 
 # Testing
