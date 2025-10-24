@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Weekly Plan</h2>
+
+<form method="post" action="/plan/new" class="grid">
+  <label>Days
+    <input type="number" name="days"
+           value="{{ (plan.plan.days if plan and plan.plan else 7) }}"
+           min="1" max="14">
+  </label>
+  <button type="submit">Generate New Plan</button>
+  {% if plan and plan.plan %}
+    <button type="submit" formaction="/plan/reroll" class="secondary">Re-roll</button>
+  {% endif %}
+</form>
+
+<p><small>Cuisine caps:
+{% if caps and caps|length > 0 %}
+  {% for k,v in caps.items() %}<span class="tag">{{k}} ≤ {{v}}</span> {% endfor %}
+{% else %}
+  none set
+{% endif %}
+</small></p>
+
+{% if plan and plan.plan %}
+  <h3>Meals</h3>
+  {% if plan.recipes and plan.recipes|length > 0 %}
+    <ol>
+      {% for pr in plan.recipes %}
+        <li><strong>{{ pr.recipe.name }}</strong> <span class="tag">{{ pr.recipe.cuisine }}</span></li>
+      {% endfor %}
+    </ol>
+  {% else %}
+    <p>No recipes in this plan.</p>
+  {% endif %}
+
+  <h3>Shopping List</h3>
+  {% if plan.groceries and plan.groceries|length > 0 %}
+    <form method="post" action="/grocery/toggle">
+      <table>
+        <thead><tr><th>Item</th><th>Qty</th><th>Have it?</th></tr></thead>
+        <tbody>
+        {% for g in plan.groceries %}
+          <tr class="{{ 'strike' if g.checked else '' }}">
+            <td>{{ g.name }}{% if g.unit %} ({{ g.unit }}){% endif %}</td>
+            <td>{{ '%.2f'|format(g.quantity) }}</td>
+            <td>
+              <button name="item_id" value="{{ g.id }}" formaction="/grocery/toggle" formmethod="post" class="secondary">
+                {{ 'Uncheck' if g.checked else 'Check' }}
+              </button>
+            </td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </form>
+  {% else %}
+    <p>No grocery items yet.</p>
+  {% endif %}
+{% else %}
+  <article>
+    <p>No active plan yet.</p>
+    <p><a href="/recipes">Add some recipes</a> and click <em>Generate New Plan</em>.</p>
+  </article>
+{% endif %}
+{% endblock %}
